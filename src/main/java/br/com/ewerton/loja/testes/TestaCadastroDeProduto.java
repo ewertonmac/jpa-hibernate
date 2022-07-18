@@ -9,10 +9,24 @@ import br.com.ewerton.loja.util.JPAUtil;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class TestaCadastroDeProduto {
 
     public static void main(String[] args) {
+        cadastrarProduto();
+        EntityManager em = JPAUtil.criarEntityManager();
+        ProdutoDAO produtoDAO = new ProdutoDAO(em);
+
+        var produto = produtoDAO.buscarPorId(1L);
+        var todosProdutos = produtoDAO.buscarTodos();
+        var produtosPorNome = produtoDAO.buscarPorNome("Xiaomi Redmi");
+        var produtos = produtoDAO.buscarPorNomeCategoria("CELULARES");
+        var precoProduto = produtoDAO.buscarPrecoProduto("Xiaomi Redmi");
+
+    }
+
+    private static void cadastrarProduto() {
         Categoria celulares = Categoria.builder()
                 .nome("CELULARES")
                 .build();
