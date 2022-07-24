@@ -33,14 +33,11 @@ public class Pedido {
     private List<ItemPedido> itens;
 
     public void adicionarItem(ItemPedido item) {
-        item.setPedido(this);
-
         if (this.itens == null) this.itens = new ArrayList<>();
-
         if (valorTotal == null) this.valorTotal = BigDecimal.ZERO;
 
+        item.setPedido(this);
         this.itens.add(item);
-
         var valorPedido = item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade()));
         this.valorTotal = this.valorTotal.add(valorPedido);
     }

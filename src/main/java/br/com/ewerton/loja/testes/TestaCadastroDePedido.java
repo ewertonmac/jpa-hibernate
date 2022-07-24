@@ -6,10 +6,13 @@ import br.com.ewerton.loja.dao.PedidoDAO;
 import br.com.ewerton.loja.dao.ProdutoDAO;
 import br.com.ewerton.loja.model.*;
 import br.com.ewerton.loja.util.JPAUtil;
+import br.com.ewerton.loja.vo.RelatorioVendasVo;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class TestaCadastroDePedido {
 
@@ -23,40 +26,91 @@ public class TestaCadastroDePedido {
         var clienteDao = new ClienteDao(entityManager);
         var pedidoDAO = new PedidoDAO(entityManager);
 
-        var produto = produtoDAO.buscarPorId(1L);
-        var cliente = clienteDao.buscarPorId(1L);
-        var pedido = Pedido.builder()
-                .cliente(cliente)
+        var produto1 = produtoDAO.buscarPorId(1L);
+        var produto2 = produtoDAO.buscarPorId(2L);
+        var produto3 = produtoDAO.buscarPorId(3L);
+
+        var cliente1 = clienteDao.buscarPorId(1L);
+        var cliente2 = clienteDao.buscarPorId(1L);
+        var cliente3 = clienteDao.buscarPorId(1L);
+
+        var pedido1 = Pedido.builder()
+                .cliente(cliente1)
                 .data(LocalDate.now())
                 .build();
 
-        var itemPedido = ItemPedido.builder()
-                .produto(produto)
-                .precoUnitario(produto.getPreco())
-                .quantidade(2)
+        var pedido2 = Pedido.builder()
+                .cliente(cliente2)
+                .data(LocalDate.now())
                 .build();
 
-        pedido.adicionarItem(itemPedido);
+        var pedido3 = Pedido.builder()
+                .cliente(cliente3)
+                .data(LocalDate.now())
+                .build();
 
-        pedidoDAO.cadastrar(pedido);
+        pedido1.adicionarItem(new ItemPedido(1, produto1));
+        pedido1.adicionarItem(new ItemPedido(2, produto2));
+        pedido1.adicionarItem(new ItemPedido(1, produto3));
+        pedido2.adicionarItem(new ItemPedido(3, produto1));
+        pedido2.adicionarItem(new ItemPedido(1, produto2));
+        pedido2.adicionarItem(new ItemPedido(1, produto3));
+        pedido3.adicionarItem(new ItemPedido(4, produto1));
+        pedido3.adicionarItem(new ItemPedido(8, produto2));
+        pedido3.adicionarItem(new ItemPedido(5, produto3));
+
+        pedidoDAO.cadastrar(pedido1);
+        pedidoDAO.cadastrar(pedido2);
+        pedidoDAO.cadastrar(pedido3);
         entityManager.getTransaction().commit();
+        imprimeRelatorio(pedidoDAO);
+
         entityManager.close();
+
     }
 
     private static void popularBancoDeDados(EntityManager entityManager) {
-        var cliente = Cliente.builder().nome("Ewerton").cpf("123456").build();
         var celulares = Categoria.builder().nome("CELULARES").build();
+        var videogames = Categoria.builder().nome("VIDEOGAMES").build();
+        var informatica = Categoria.builder().nome("INFORMATICA").build();
+
         var celular = Produto.builder().nome("Xiaomi Redmi").descricao("Smartphone Android Xiaomi")
                 .preco(BigDecimal.valueOf(1500)).dataCadastro(LocalDate.now()).categoria(celulares)
                 .build();
+        var xbox = Produto.builder().nome("Xbox").descricao("Xbox Series X")
+                .preco(BigDecimal.valueOf(4500)).dataCadastro(LocalDate.now()).categoria(videogames)
+                .build();
+        var mackbook = Produto.builder().nome("Mackbook air").descricao("Mackbook air M1")
+                .preco(BigDecimal.valueOf(13000)).dataCadastro(LocalDate.now()).categoria(informatica)
+                .build();
 
+        var cliente = Cliente.builder().nome("Ewerton").cpf("123456").build();
+        var cliente2 = Cliente.builder().nome("João").cpf("123456").build();
+        var cliente3 = Cliente.builder().nome("Pedro").cpf("123456").build();
 
         var categoriaDAO = new CategoriaDAO(entityManager);
         var produtoDAO = new ProdutoDAO(entityManager);
         var clienteDao = new ClienteDao(entityManager);
 
         categoriaDAO.cadastrar(celulares);
+        categoriaDAO.cadastrar(videogames);
+        categoriaDAO.cadastrar(informatica);
         produtoDAO.cadastrar(celular);
+        produtoDAO.cadastrar(xbox);
+        produtoDAO.cadastrar(mackbook);
         clienteDao.cadastrar(cliente);
+        clienteDao.cadastrar(cliente2);
+        clienteDao.cadastrar(cliente3);
+    }
+
+    private static void imprimeRelatorio(PedidoDAO dao){
+        List<RelatorioVendasVo> vendas = dao.gerarRelatorioVendas();
+
+        System.out.println("\n".repeat(200));
+        vendas.forEach(obj -> {
+            var dataFormatada = obj.getDataUltimaVenda().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            System.out.println(String.format("%22s | %8s | %16s", obj.getNome(), obj.getQuantidadeVendida(), dataFormatada));
+
+        });
     }
 }

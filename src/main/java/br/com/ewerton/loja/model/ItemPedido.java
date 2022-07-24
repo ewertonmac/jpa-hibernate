@@ -28,4 +28,9 @@ public class ItemPedido {
     @ManyToOne
     private Pedido pedido;
 
+    public ItemPedido(Integer quantidade, Produto produto) {
+        this.precoUnitario = produto.getPreco();
+        this.quantidade = quantidade;
+        this.produto = produto;
+    }
 }
