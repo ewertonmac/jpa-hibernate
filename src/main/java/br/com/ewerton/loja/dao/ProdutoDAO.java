@@ -44,6 +44,9 @@ public class ProdutoDAO {
 
         return em.createQuery(jpql, BigDecimal.class)
                 .setParameter("nome", nome)
-                .getSingleResult();
+                .getResultList()
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 }

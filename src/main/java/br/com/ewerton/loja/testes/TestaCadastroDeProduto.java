@@ -9,14 +9,15 @@ import br.com.ewerton.loja.util.JPAUtil;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 public class TestaCadastroDeProduto {
 
     public static void main(String[] args) {
-        cadastrarProduto();
-        EntityManager em = JPAUtil.criarEntityManager();
-        ProdutoDAO produtoDAO = new ProdutoDAO(em);
+        var entityManager = JPAUtil.criarEntityManager();
+        entityManager.getTransaction().begin();
+        cadastrarProduto(entityManager);
+        entityManager.flush();
+        ProdutoDAO produtoDAO = new ProdutoDAO(entityManager);
 
         var produto = produtoDAO.buscarPorId(1L);
         var todosProdutos = produtoDAO.buscarTodos();
@@ -26,7 +27,7 @@ public class TestaCadastroDeProduto {
 
     }
 
-    private static void cadastrarProduto() {
+    private static void cadastrarProduto(EntityManager entityManager) {
         Categoria celulares = Categoria.builder()
                 .nome("CELULARES")
                 .build();
@@ -39,14 +40,10 @@ public class TestaCadastroDeProduto {
                 .categoria(celulares)
                 .build();
 
-        EntityManager em = JPAUtil.criarEntityManager();
-        CategoriaDAO categoriaDAO = new CategoriaDAO(em);
-        ProdutoDAO produtoDAO = new ProdutoDAO(em);
+        CategoriaDAO categoriaDAO = new CategoriaDAO(entityManager);
+        ProdutoDAO produtoDAO = new ProdutoDAO(entityManager);
 
-        em.getTransaction().begin();
         categoriaDAO.cadastrar(celulares);
         produtoDAO.cadastrar(celular);
-        em.getTransaction().commit();
-        em.close();
     }
 }
