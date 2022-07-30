@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -48,5 +49,23 @@ public class ProdutoDAO {
                 .stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<Produto> buscarProdutoCriteriaAPI(String nome, BigDecimal preco, LocalDate dataCadastro){
+        var builder = em.getCriteriaBuilder();
+        var query = builder.createQuery(Produto.class);
+        var from = query.from(Produto.class);
+        var and = builder.and();
+
+        if(nome != null && !nome.trim().isEmpty())
+            and = builder.and(and, builder.equal(from.get("nome"), nome));
+        if(preco != null)
+            and = builder.and(and, builder.equal(from.get("preco"), preco));
+        if(dataCadastro != null)
+            and = builder.and(and, builder.equal(from.get("dataCadastro"), dataCadastro));
+
+        query.where(and);
+
+        return em.createQuery(query).getResultList();
     }
 }

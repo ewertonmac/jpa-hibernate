@@ -65,7 +65,11 @@ public class TestaCadastroDePedido {
         entityManager.getTransaction().commit();
         imprimeRelatorio(pedidoDAO);
 
+        var pedido = pedidoDAO.buscarPedidoComCliente(pedido1.getId());
+
         entityManager.close();
+
+        System.out.println(pedido.getCliente().getNome() + " - " + pedido.getCliente().getCpf());
 
     }
 
@@ -84,9 +88,9 @@ public class TestaCadastroDePedido {
                 .preco(BigDecimal.valueOf(13000)).dataCadastro(LocalDate.now()).categoria(informatica)
                 .build();
 
-        var cliente = Cliente.builder().nome("Ewerton").cpf("123456").build();
-        var cliente2 = Cliente.builder().nome("João").cpf("123456").build();
-        var cliente3 = Cliente.builder().nome("Pedro").cpf("123456").build();
+        var cliente = Cliente.builder().dadosPessoais(DadosPessoais.builder().nome("Ewerton").cpf("123456").build()).build();
+        var cliente2 = Cliente.builder().dadosPessoais(DadosPessoais.builder().nome("João").cpf("123456").build()).build();
+        var cliente3 = Cliente.builder().dadosPessoais(DadosPessoais.builder().nome("Pedro").cpf("123456").build()).build();
 
         var categoriaDAO = new CategoriaDAO(entityManager);
         var produtoDAO = new ProdutoDAO(entityManager);
@@ -101,6 +105,8 @@ public class TestaCadastroDePedido {
         clienteDao.cadastrar(cliente);
         clienteDao.cadastrar(cliente2);
         clienteDao.cadastrar(cliente3);
+
+        produtoDAO.buscarProdutoCriteriaAPI("Mackbook air", BigDecimal.ONE, LocalDate.now());
     }
 
     private static void imprimeRelatorio(PedidoDAO dao){

@@ -1,13 +1,13 @@
 package br.com.ewerton.loja.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "clientes")
-@Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +16,15 @@ public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nome;
-    private String cpf;
+
+    @Embedded
+    private DadosPessoais dadosPessoais;
+
+    public String getNome(){
+        return this.dadosPessoais.getNome();
+    }
+
+    public String getCpf(){
+        return this.dadosPessoais.getCpf();
+    }
 }

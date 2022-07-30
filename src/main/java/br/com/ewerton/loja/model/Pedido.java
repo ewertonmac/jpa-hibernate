@@ -23,7 +23,7 @@ public class Pedido {
     private Long id;
     private LocalDate data;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Cliente cliente;
 
     @Column(name = "valor_total")

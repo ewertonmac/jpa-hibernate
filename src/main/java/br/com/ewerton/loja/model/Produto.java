@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "produtos")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 @Builder
@@ -25,7 +26,7 @@ public class Produto {
     @Column(name="data_cadastro")
     private LocalDate dataCadastro;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
